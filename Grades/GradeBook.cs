@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Grades
 {
-    public class GradeBook
+    public class GradeBook: GradeTracker
     {
         public GradeBook()
         {
@@ -15,10 +16,12 @@ namespace Grades
             grades = new List<float>();
         }
 
-        public GradeStatistics ComputeStatistics()
+        public override GradeStatistics ComputeStatistics()
         {
+            Console.WriteLine("GradeBook::ComputeStatistics");
+
             GradeStatistics stats = new GradeStatistics();
-            stats.HighestGrade = 0;
+            //stats.HighestGrade = 0;
 
             float sum = 0;
 
@@ -34,45 +37,19 @@ namespace Grades
             return stats;
         }
 
-        public void AddGrade(float grade)
+        public override void AddGrade(float grade)
         {
             grades.Add(grade);
         }
 
-        public string Name
+        public override IEnumerator GetEnumerator()
         {
-            get { return _name; }
-            set
-            {
-
-                if (_name != value && NameChanged != null)
-                {
-
-                    if (String.IsNullOrEmpty(value))
-                    {
-                        throw new ArgumentException("Name cannot be null of empty.");
-                    }
-
-
-                    NameChangedEventArgs args = new NameChangedEventArgs();
-                    args.ExistingName = _name;
-                    args.NewName = value;
-
-                    NameChanged(this, args);
-                }
-
-                _name = value;
-
-            }
+            return grades.GetEnumerator();
         }
 
-        public event NameChangedDelegate NameChanged;
+        protected List<float> grades;
 
-        private string _name;
-
-        private List<float> grades;
-
-        public void WriteGrades(TextWriter destination)
+        public override void WriteGrades(TextWriter destination)
         {
             for (int i = 0; i < grades.Count; i++)
             {
